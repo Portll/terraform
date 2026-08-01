@@ -18,6 +18,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 
 	tfe "github.com/hashicorp/go-tfe"
 	svchost "github.com/hashicorp/terraform-svchost"
@@ -417,6 +418,11 @@ func (c *LoginCommand) interactiveGetTokenByCode(hostname svchost.Hostname, cred
 	// to the main execution path that follows.
 	codeCh := make(chan string)
 	server := &http.Server{
+		// A client that opens a connection and then dribbles out request
+		// headers holds this goroutine open until the operator interrupts
+		// the login. The callback is a same-machine redirect that arrives
+		// immediately, so a short header deadline costs nothing.
+		ReadHeaderTimeout: 10 * time.Second,
 		Handler: http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
 			log.Printf("[TRACE] login: request to callback server")
 			err := req.ParseForm()

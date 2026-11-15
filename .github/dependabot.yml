@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: daily
+    # Do not adopt a release during the window in which a compromised or
+    # yanked publish is most likely to be caught and pulled. Security
+    # updates are exempt, so an advisory-driven bump is never delayed.
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
       - go
@@ -14,6 +19,8 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
       - build
